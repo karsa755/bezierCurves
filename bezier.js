@@ -3,12 +3,13 @@ var context = canvas.getContext("2d");
 var ctrlPoints = [];
 var height = canvas.height = window.innerHeight;
 var width = canvas.width = window.innerWidth;
-var tessEps = 2.0;
+var tessEps = 0.2;
 var mouseClicked = false, mouseReleased = true;
 ctrlPoints.push({x:0, y:0});
 ctrlPoints.push({x:200, y:200});
 ctrlPoints.push({x:600, y:0});
 ctrlPoints.push({x:1000, y:200});
+var deg = ctrlPoints.length - 2;
 
 for(var i = 0; i < ctrlPoints.length; ++i)
 {
@@ -58,8 +59,8 @@ function midSubdivide(bez,leftBez, rightBez, t) {
     console.log(leftBez);
     leftBez[0].x = bez[0].x;
 	leftBez[0].y = bez[0].y;
-	rightBez[bez.length-1].x = bez[bez.length-1].x;
-	rightBez[bez.length-1].y = bez[bez.length-1].y;
+	rightBez[bez.length-2].x = bez[bez.length-2].x;
+	rightBez[bez.length-2].y = bez[bez.length-2].y;
 
     for(var k = 1; k < bez.length; ++k)
     {
@@ -72,8 +73,8 @@ function midSubdivide(bez,leftBez, rightBez, t) {
         		//subdivision of the curve
 		leftBez[k].x = bez[0].x;
 		leftBez[k].y = bez[0].y;
-		rightBez[bez.length-1 - k].x = bez[bez.length-1 - k].x;
-		rightBez[bez.length-1 - k].y = bez[bez.length-1 - k].y;
+		rightBez[bez.length-2 - k].x = bez[bez.length-2 - k].x;
+		rightBez[bez.length-2 - k].y = bez[bez.length-2 - k].y;
     }
 }
 
@@ -101,7 +102,7 @@ function plotBezier(bez)
     }
     else
     {
-        midSubdivide(bez, leftBez, rightBez);
+        midSubdivide(bez, leftBez, rightBez, 0.5);
         plotBezier(leftBez);
         plotBezier(rightBez);
     }
