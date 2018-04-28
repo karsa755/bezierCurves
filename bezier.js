@@ -3,9 +3,9 @@ var context = canvas.getContext("2d");
 var ctrlPoints = [];
 var height = canvas.height = window.innerHeight;
 var width = canvas.width = window.innerWidth;
-var tessEps = 0.2;
+var tessEps = 100;
 var mouseClicked = false, mouseReleased = true;
-ctrlPoints.push({x:0, y:0});
+ctrlPoints.push({x:100, y:100});
 ctrlPoints.push({x:200, y:200});
 ctrlPoints.push({x:600, y:0});
 ctrlPoints.push({x:1000, y:200});
@@ -22,23 +22,26 @@ for(var i = 0; i < ctrlPoints.length; ++i)
         //context.stroke();
     }
 }
-plotBezier(ctrlPoints);
+
+plotBezier(ctrlPoints, deg);
 //document.addEventListener("click", onMouseClick, false);
 //document.addEventListener("mousemove", onMouseMove, false);
 
 function onMouseClick(e) {
     ctrlPoints.push({x:e.clientX, y:e.clientY});
     context.fillRect(e.clientX,e.clientY,10,10); 
-    console.log(ctrlPoints);
+   
     mouseClicked = !mouseClicked;
 }
 
-function maxDistance(A) {
-    var baselineX = A[A.length-1].x - A[0].x;
-    var baselineY = A[A.length-1].y - A[0].y;
+function maxDistance(A, k) {
+    
+    var baselineX = A[k+1].x - A[0].x;
+    var baselineY = A[k+1].y - A[0].y;
+ 
     var maxH = -1;
 
-    for(var i = 0;  i < A.length; ++i)
+    for(var i = 0;  i < k+2; ++i)
     {
         var seclineX = A[i].x - A[0].x;
         var seclineY = A[i].y - A[0].y;
@@ -51,20 +54,21 @@ function maxDistance(A) {
             maxH = h;
         }
     }
+    
     return maxH;
 }
 
-function midSubdivide(bez,leftBez, rightBez, t) {
+function midSubdivide(bez,leftBez, rightBez, t, deg) {
     
-    console.log(leftBez);
-    leftBez[0].x = bez[0].x;
+    
+    leftBez[0].x = bez[0].x;    
 	leftBez[0].y = bez[0].y;
-	rightBez[bez.length-2].x = bez[bez.length-2].x;
-	rightBez[bez.length-2].y = bez[bez.length-2].y;
+	rightBez[deg+1].x = bez[deg+1].x;
+	rightBez[deg+1].y = bez[deg+1].y;
 
-    for(var k = 1; k < bez.length; ++k)
+    for(var k = 1; k < deg+2; ++k)
     {
-        for(i = 0; i < bez.length-k; ++i)
+        for(i = 0; i < deg+2-k; ++i)
         {
 			//basically de Casteljau algorithm
 			bez[i].x = (1 - t) * bez[i].x + t*bez[i + 1].x;
@@ -73,38 +77,43 @@ function midSubdivide(bez,leftBez, rightBez, t) {
         		//subdivision of the curve
 		leftBez[k].x = bez[0].x;
 		leftBez[k].y = bez[0].y;
-		rightBez[bez.length-2 - k].x = bez[bez.length-2 - k].x;
-		rightBez[bez.length-2 - k].y = bez[bez.length-2 - k].y;
+		rightBez[deg+2 - k].x = bez[deg+2 - k].x;
+		rightBez[deg+2 - k].y = bez[deg+2 - k].y;
     }
+    
 }
 
-function plotBezier(bez)
+function plotBezier(bez, k)
 {
-    var height = maxDistance(bez);
-    leftBez = [];
-    rightBez = [];
-    for(var i = 0; i < bez.length; ++i)
+    console.log(bez);
+    var leftBez = [];
+    var rightBez = [];
+    for(var i = 0; i < deg+2; ++i)
     {
         leftBez.push({x:0, y:0});
-        rightBez.push({x:0, y:0});
+        rightBez.push({x:0,y:0});
     }
 
+    var height = maxDistance(bez, k);
+    
     if(height < tessEps)
     {
-        context.fillRect(bez[0].x, bez[0].y,10,10);
-        context.fillRect(bez[bez.length-1].x, bez[bez.length-1].y,10,10); 
+       
+        
+        context.fillRect(bez[k+1].x, bez[k+1].y,2,2); 
 
         context.beginPath();
         context.moveTo(bez[0].x, bez[0].y);
-        context.lineTo(bez[bez.length-1].x, bez[bez.length-1].y);
+        //context.moveTo(100, 100);
+        context.lineTo(bez[k+1].x, bez[k+1].y);
         context.stroke();
 
     }
     else
     {
-        midSubdivide(bez, leftBez, rightBez, 0.5);
-        plotBezier(leftBez);
-        plotBezier(rightBez);
+        midSubdivide(bez, leftBez, rightBez, 0.5, k);
+        plotBezier(leftBez, k);
+        plotBezier(rightBez, k);
     }
 
 }
@@ -114,3 +123,4 @@ function onMouseMove(e) {
 
     }
 }
+
