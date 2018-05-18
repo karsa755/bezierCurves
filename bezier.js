@@ -7,12 +7,72 @@ var width = canvas.width = window.innerWidth;
 var tessEps = 2;
 var mouseClicked = false, mouseReleased = true;
 
+/* ctrlPoints.push({x:0, y:0});
+ctrlPoints.push({x:430, y:520});
+ctrlPoints.push({x:1000, y:00});
+ctrlPoints.push({x:300, y:250});
+var newDeg = ctrlPoints.length -1;
+for(var i = 0; i < ctrlPoints.length; ++i)
+{
+    context.fillRect(ctrlPoints[i].x,ctrlPoints[i].y,10,10);
+}
+for(var i = 0; i < ctrlPoints.length; ++i)
+{
+
+    var newCurve = [];
+    var T0X = 0;
+    var T1X = 0;
+    var T0Y = 0;
+    var T1Y = 0;
+    if(i == 0)
+    {   
+        T0X = 0.5 * ctrlPoints[i+1].x;
+        T0Y = 0.5 * ctrlPoints[i+1].y;
+
+        T1X = -0.5 * (ctrlPoints[i+2].x - ctrlPoints[i].x);
+        T1Y = -0.5 * (ctrlPoints[i+2].y - ctrlPoints[i].y);
+        //newCurve.push(ctrlPoints[i],  )
+        console.log(T0X);
+    }
+    else if(i == ctrlPoints.length -2)
+    {
+        T0X = 0.5 * (ctrlPoints[i+1].x - ctrlPoints[i-1].x);
+        T0Y = 0.5 * (ctrlPoints[i+1].y - ctrlPoints[i-1].y);
+
+        T1X = 0.5 * ctrlPoints[i].x;
+        T1Y = 0.5 * ctrlPoints[i].y;
+    }
+    else if(i == ctrlPoints.length -1)
+    {
+
+    }
+    else
+    {
+        T0X = 0.5 * (ctrlPoints[i+1].x - ctrlPoints[i-1].x);
+        T0Y = 0.5 * (ctrlPoints[i+1].y - ctrlPoints[i-1].y);
+        T1X = -0.5 * (ctrlPoints[i+2].x - ctrlPoints[i].x);
+        T1Y = -0.5 * (ctrlPoints[i+2].y - ctrlPoints[i].y);
+    }
+    
+    if(i < 3)
+    {
+
+        newCurve.push(ctrlPoints[i]);
+        newCurve.push({x:ctrlPoints[i].x + (1/3) *T0X, y:ctrlPoints[i].y + (1/3) *T0Y});
+        newCurve.push({x:ctrlPoints[i+1].x + (1/3) *T1X, y:ctrlPoints[i+1].y + (1/3) *T1Y});
+        newCurve.push(ctrlPoints[i+1]);
+        //plotBezier(newCurve, 3);
+        console.log(newCurve);
+    }
+    
+} */
 
 document.addEventListener("click", onMouseClick, false);
 document.addEventListener("mousemove", onMouseMove, false);
 
 function onMouseClick(e) {
     ctrlPoints.push({x:e.clientX, y:e.clientY});
+
     deg = ctrlPoints.length-1;
     context.fillRect(e.clientX,e.clientY,10,10);
     
@@ -23,7 +83,6 @@ function onMouseClick(e) {
         plotBezier(ctrlPoints,deg);
     }
     mouseClicked = !mouseClicked;
-    console.log(ctrlPoints);
 }
 
 
@@ -72,8 +131,8 @@ function midSubdivide(Originalbez,leftBez, rightBez, t=0.5, deg) {
         for(i = 0; i < deg+1-k; ++i)
         {
 			//basically de Casteljau algorithm
-			bez[i].x = (1 - t) * bez[i].x + t*bez[i + 1].x;
-			bez[i].y = (1 - t) * bez[i].y + t*bez[i + 1].y;
+			bez[i].x =  ((1 - t) * bez[i].x + t*bez[i + 1].x);
+			bez[i].y =  ((1 - t) * bez[i].y + t*bez[i + 1].y);
         }
         		//subdivision of the curve
 		leftBez[k].x = bez[0].x;
@@ -95,12 +154,11 @@ function plotBezier(bez, k,x,y)
     }
 
     var height = maxDistance(bez, k);
-    context.beginPath();
     if(height < tessEps)
     {     
         context.fillRect(bez[k].x, bez[k].y,5,5); 
 
-        
+        context.beginPath();
         context.moveTo(bez[0].x, bez[0].y);
         context.lineTo(bez[k].x, bez[k].y);
         context.stroke();
@@ -133,5 +191,8 @@ function clearCanvas(){
     if(event.keyCode == 67) {
         ctrlPoints = [];
         clearCanvas();
+    }
+    if(event.keyCode == 83) {
+        ctrlPoints = [];
     }
 });
